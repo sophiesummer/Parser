@@ -261,5 +261,5 @@ class Scraper:
             json.dump(result, fp)
 
 
-scraper = Scraper(start_url, 130)
+scraper = Scraper(start_url, 126)
 scraper.start_scrap()
