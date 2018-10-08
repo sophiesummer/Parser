@@ -10,12 +10,14 @@ pre_url = "https://en.wikipedia.org"
 present_year = 2018
 
 
+# open the web page and apply beautiful soup structure
 def make_soup(url):
     pages = urllib.request.urlopen(url)
     soup_data = BeautifulSoup(pages, "html.parser")
     return soup_data
 
 
+# Scraper class prepared for scraping multiple web pages
 class Scraper:
     def __init__(self, start_url, max_actor_num):
         self.actors_set = {}  # name : url
@@ -31,6 +33,7 @@ class Scraper:
         self.movies_data = []
         logging.basicConfig(filename='scraper_status.log', level=logging.DEBUG)
 
+    # given an actor webpage url and the name, scrap his age and movie works
     def scrap_actor(self, actor_url, actor_name):
         logging.info("^^^^^^^^^^^")
         logging.info(actor_url)
@@ -113,7 +116,8 @@ class Scraper:
             logging.warning('cannot make soup for this actor_link')
             return actor, movie_list
 
-
+    # given a movie web page url and its name, scrap its gross, released year
+    # and all actors in the movie
     def scrap_movie(self, movie_url, movie_name):
         movie = dict()
         movie['name'] = movie_name
@@ -126,7 +130,8 @@ class Scraper:
             logging.info('before movie soup')
             soup = make_soup(movie_url)
             logging.info('after movie soup')
-            movie_info = soup.find('table', {"class": re.compile("infobox.*")}).find('tbody')
+            movie_info = soup.find('table', {"class": re.compile("infobox.*")}).\
+                find('tbody')
 
         except:
             logging.warning("no infobox in this movie page")
@@ -146,15 +151,16 @@ class Scraper:
                 movie['year'] = int(release_date[:4])
             except:
                 try:
-                    release_date = (movie_info.find('th', text=("Release date")).find_parent('tr').\
-                        find('td').text)
+                    release_date = (movie_info.find('th', text=("Release date")).
+                                    find_parent('tr').find('td').text)
                     movie['year'] = release_date[-4:]
                     movie['year'] = int(movie['year'])
                 except:
                     logging.warning("no release year")
 
             try:
-                star_list = movie_info.find('th', text=('Starring')).find_parent('tr').find_all('a')
+                star_list = movie_info.find('th', text=('Starring')).find_parent('tr').\
+                    find_all('a')
                 for a in star_list:
                     actor_name = a.text
                     try:
@@ -169,6 +175,7 @@ class Scraper:
 
         return movie, actor_list
 
+    # transform gross information from string to float numbers
     def box_office_format(self, box_office):
         start = box_office.index("$")
         box_office = box_office[start + 1:]
@@ -192,6 +199,7 @@ class Scraper:
 
         return gross
 
+    # scrap loop
     def start_scrap(self):
         self.actors_set["Morgan Freeman"] = self.start_url
         self.actors_queue.append("Morgan Freeman")
@@ -254,7 +262,7 @@ class Scraper:
             logging.info(self.curr_actor_num)
             logging.info(self.curr_movie_num)
 
-
+    # write generated actor and movie information into json file
     def write_to_json(self):
         result = []
         result.append(self.actors_data)

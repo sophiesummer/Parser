@@ -1,6 +1,7 @@
 import json
 
 
+# Actor class prepared for creating an Actor object
 class Actor:
     def __init__(self, name, birthday, age, movies):
         self.name = name
@@ -10,6 +11,7 @@ class Actor:
         self.movies_edge = {}  # dict(movie_name: weight)
 
 
+# Movie class prepared for creating a Movie object
 class Movie:
     def __init__(self, name, gross, year, actors):
         self.name = name
@@ -19,6 +21,7 @@ class Movie:
         self.actors_edge = {}  # dict(actor_name: weight)
 
 
+# Graph class prepared for creating a Graph object from scraped data
 class Graph:
     def __init__(self):
         self.actors = []
@@ -26,12 +29,15 @@ class Graph:
         self.helper_set = {}
         self.helper_actor_set = {}
 
+    # add an actor object to graph actor array
     def add_actor(self, actor):
         self.actors.append(actor)
 
+    # add a movie object to graph movie array
     def add_movie(self, movie):
         self.movies.append(movie)
 
+    # add edges between to linked actor and movie with weight
     def add_edges(self, actor, movie):
         weight = (200-actor.age)*10**4 + movie.gross * 0.00001
         if movie.name not in actor.movies_edge:
@@ -40,11 +46,13 @@ class Graph:
         if actor.name not in movie.actors_edge:
             movie.actors_edge[actor.name] = weight
 
+    # get data from json file
     def get_graph_data(self):
         f = open('data.json')
         graph_data = json.loads(f.read())
         return graph_data
 
+    # construct whole graph structure
     def construct_graph(self):
         graph_data = self.get_graph_data()
         actor_data = graph_data[0]
@@ -53,18 +61,21 @@ class Graph:
         self.construct_movies(movie_data)
         self.construct_edges()
 
+    # put actor information into individual Actor object and insert into graph
     def construct_actors(self, actor_data):
         for actor in actor_data:
             actor_obj = Actor(actor['name'], actor['birthday'], actor['age'], actor['movies'])
             self.actors.append(actor_obj)
             self.helper_actor_set[actor['name']] = actor_obj
 
+    # put movie information into individual Movie object and insert into graph
     def construct_movies(self, movie_data):
         for movie in movie_data:
             movie_obj = Movie(movie['name'], movie['gross'], movie['year'], movie['actors'])
             self.movies.append(movie_obj)
             self.helper_set[movie['name']] = movie_obj
 
+    # generate edges between connected movies and actors
     def construct_edges(self):
         for actor in self.actors:
             movies_name_list = actor.movie_name
@@ -73,6 +84,7 @@ class Graph:
                     movie_obj = self.helper_set[movie_name]
                     self.add_edges(actor, movie_obj)
 
+    # get gross value for a specific movie
     def get_gross(self, movie_name):
         if movie_name in self.helper_set:
             movie_obj = self.helper_set[movie_name]
@@ -80,6 +92,7 @@ class Graph:
         else:
             print("The movie not exists")
 
+    # get all movie works of a given actor
     def get_all_movie_of_actor(self, actor_name):
         movies_result = []
         if actor_name in self.helper_actor_set:
@@ -92,6 +105,7 @@ class Graph:
             print('The actor not exists')
         return movies_result
 
+    # get all actors in a specific movie
     def get_all_actor_of_movie(self, movie_name):
         actors_result = []
         if movie_name in self.helper_set:
@@ -104,6 +118,7 @@ class Graph:
             print('The movie not exists')
         return actors_result
 
+    # get all movies released in a given year
     def all_movie_given_year(self, year):
         count = 0
         movies = []
@@ -116,6 +131,7 @@ class Graph:
             print('No movie in this year')
         return movies
 
+    # get the oldest x actors
     def oldest_X_actors(self, number):
         number = max(number, 0)
         number = min(number, len(self.actors))
@@ -126,6 +142,7 @@ class Graph:
             oldest_actors.append(self.actors[i].name)
         return oldest_actors
 
+    # get an array of actors who acted in a movie in a given year
     def actors_given_year(self, year):
         actors_result = []
         count = 0
@@ -143,6 +160,7 @@ class Graph:
             print('No actor had works in this year')
         return actors_result
 
+    # select the top x actors who owned most total gross value
     def top_X_actors_with_most_gross(self, number):
         number = min(number, len(self.actors))
         number = max(number, 0)
@@ -164,6 +182,7 @@ class Graph:
             gross_namelist.append(actor_gross[i]['actor_name'])
         return gross_namelist
 
+    # graph query interface
     def start_query(self):
         self.construct_graph()
         num = 0
