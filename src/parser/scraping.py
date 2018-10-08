@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import json
 import re
+import logging
 
 
 start_url = "https://en.wikipedia.org/wiki/Morgan_Freeman"
@@ -28,10 +29,11 @@ class Scraper:
         self.start_url = start_url
         self.actors_data = []  # save result
         self.movies_data = []
+        logging.basicConfig(filename='scraper_status.log', level=logging.DEBUG)
 
     def scrap_actor(self, actor_url, actor_name):
-        print("^^^^^^^^^^^")
-        print(actor_url)
+        logging.info("^^^^^^^^^^^")
+        logging.info(actor_url)
         actor = dict()
         actor['movies'] = []
         actor['name'] = actor_name
@@ -40,16 +42,16 @@ class Scraper:
         actor['age'] = -1
 
         try:
-            print('before actor soup')
+            logging.info('before actor soup')
             soup = make_soup(actor_url)
-            print('after actor soup')
+            logging.info('after actor soup')
             try:
                 born_info = soup.find('table', {"class": re.compile('infobox.*')}).\
                     find('tbody').find('th', text=('Born')).find_parent('tr').\
                     find('span', {'class': "bday"}).text
 
             except:
-                print("no birthday info")
+                logging.debug('no birthday info')
 
             else:
                 actor['birthday'] = born_info
@@ -86,7 +88,7 @@ class Scraper:
                                 actor['movies'].append(film_name)
                                 movie_list[film_name] = film_web
                         except:
-                            print('none href for current web')
+                            logging.debug('none href for current web')
 
             except:
                 # if filmography is inside the webpage
@@ -104,11 +106,11 @@ class Scraper:
                             actor['movies'].append(film_name)
                             movie_list[film_name] = film_web
                 except:
-                    print("nothing in filmography")
-            print("^^^^^^^^^^^^^^^^^^^^")
+                    logging.warning("nothing in filmography")
+            logging.info("^^^^^^^^^^^^^^^^^^^^")
             return actor, movie_list
         except:
-            print('cannot make soup for this actor_link')
+            logging.warning('cannot make soup for this actor_link')
             return actor, movie_list
 
 
@@ -121,13 +123,13 @@ class Scraper:
         movie['year'] = -1
 
         try:
-            print('before movie soup')
+            logging.info('before movie soup')
             soup = make_soup(movie_url)
-            print('after movie soup')
+            logging.info('after movie soup')
             movie_info = soup.find('table', {"class": re.compile("infobox.*")}).find('tbody')
 
         except:
-            print("no infobox in this movie page")
+            logging.warning("no infobox in this movie page")
             return movie, actor_list
 
         else:
@@ -136,7 +138,7 @@ class Scraper:
                 box_office = box_office_title.find_parent('tr').find('td').contents[0]
                 movie['gross'] = self.box_office_format(box_office) # change to number function
             except:
-                print("no gross info")
+                logging.warning("no gross info")
 
             try:
                 release_date = movie_info.find('th', text=("Release date")).find_parent('tr').\
@@ -149,7 +151,7 @@ class Scraper:
                     movie['year'] = release_date[-4:]
                     movie['year'] = int(movie['year'])
                 except:
-                    print("no release year")
+                    logging.warning("no release year")
 
             try:
                 star_list = movie_info.find('th', text=('Starring')).find_parent('tr').find_all('a')
@@ -161,9 +163,9 @@ class Scraper:
                         actor_list[actor_name] = actor_link
                         movie['actors'].append(actor_name)
                     except:
-                        print("no this star href")
+                        logging.warning("no this star href")
             except:
-                print('no starring info')
+                logging.warning('no starring info')
 
         return movie, actor_list
 
@@ -198,8 +200,8 @@ class Scraper:
 
             # scrape actors info
             while len(self.actors_queue) > 0 and self.curr_actor_num <= self.max_actor_num:
-                print("&&&&&& current : actor numbers: ")
-                print(self.curr_actor_num)
+                logging.info("&&&&&& current : actor numbers: ")
+                logging.info(self.curr_actor_num)
                 actor_name = self.actors_queue[0]
                 actor_url = self.actors_set[actor_name]
                 self.actors_queue.pop(0)
@@ -208,7 +210,7 @@ class Scraper:
 
                 actor, movie_list = self.scrap_actor(actor_url, actor_name)
                 if (actor['birthday'] == "") and len(movie_list) == 0:
-                    print('birthday and movie_list not exist')
+                    logging.debug('birthday and movie_list not exist')
                     continue
 
                 self.actors_data.append(actor)
@@ -223,16 +225,16 @@ class Scraper:
             # scrap movie info
             while len(self.movies_queue) > 0 and self.curr_movie_num <= self.max_movie_num:
 
-                print('current movie number: ')
-                print(self.curr_movie_num)
+                logging.info('current movie number: ')
+                logging.info(self.curr_movie_num)
                 movie_name = self.movies_queue[0]
                 movie_url = self.movies_set[movie_name]
                 self.movies_queue.pop(0)
                 if len(movie_url) < 5:
                     continue
-                print("$$$")
-                print(movie_name)
-                print(movie_url)
+                logging.info("$$$")
+                logging.info(movie_name)
+                logging.info(movie_url)
                 movie, actor_list = self.scrap_movie(movie_url, movie_name)
                 if len(actor_list) == 0 or (movie['year'] == -1 and movie['gross'] == -1):
                     continue
@@ -248,9 +250,9 @@ class Scraper:
                     self.actors_queue.append(actor_name_in_list)
 
             self.write_to_json()
-            print('write_to_json')
-            print(self.curr_actor_num)
-            print(self.curr_movie_num)
+            logging.info('write_to_json')
+            logging.info(self.curr_actor_num)
+            logging.info(self.curr_movie_num)
 
 
     def write_to_json(self):

@@ -81,38 +81,53 @@ class Graph:
             print("The movie not exists")
 
     def get_all_movie_of_actor(self, actor_name):
+        movies_result = []
         if actor_name in self.helper_actor_set:
             actor_obj = self.helper_actor_set[actor_name]
             movies = actor_obj.movie_name
             for m in movies:
                 print(m)
+                movies_result.append(m)
         else:
             print('The actor not exists')
+        return movies_result
 
     def get_all_actor_of_movie(self, movie_name):
+        actors_result = []
         if movie_name in self.helper_set:
             movie_obj = self.helper_set[movie_name]
             actors = movie_obj.actor_name
             for a in actors:
                 print(a)
+                actors_result.append(a)
         else:
             print('The movie not exists')
+        return actors_result
 
     def all_movie_given_year(self, year):
         count = 0
+        movies = []
         for movie_obj in self.movies:
             if movie_obj.year == year:
                 count += 1
                 print(movie_obj.name)
+                movies.append(movie_obj.name)
         if count == 0:
             print('No movie in this year')
+        return movies
 
     def oldest_X_actors(self, number):
+        number = max(number, 0)
+        number = min(number, len(self.actors))
+        oldest_actors = []
         self.actors.sort(key = lambda  x: x.age, reverse=True)
-        for i in range(min(number,len(self.actors))):
+        for i in range(number):
             print(self.actors[i].name + ' : ' + str(self.actors[i].age))
+            oldest_actors.append(self.actors[i].name)
+        return oldest_actors
 
     def actors_given_year(self, year):
+        actors_result = []
         count = 0
         for actor in self.actors:
             for movie_name in actor.movie_name:
@@ -122,12 +137,16 @@ class Graph:
                 if movie_obj.year == year:
                     count += 1
                     print(actor.name + " : " + movie_obj.name)
+                    actors_result.append(actor.name)
+                    break
         if count == 0:
             print('No actor had works in this year')
+        return actors_result
 
     def top_X_actors_with_most_gross(self, number):
-        if number > len(self.actors):
-            number = len(self.actors)
+        number = min(number, len(self.actors))
+        number = max(number, 0)
+        gross_namelist = []
         actor_gross = []
         for actor in self.actors:
             ele = {}
@@ -142,6 +161,8 @@ class Graph:
         actor_gross.sort(key = lambda x: x['total_gross'], reverse=True)
         for i in range(number):
             print(actor_gross[i]['actor_name'] + " : " + str(actor_gross[i]['total_gross']))
+            gross_namelist.append(actor_gross[i]['actor_name'])
+        return gross_namelist
 
     def start_query(self):
         self.construct_graph()
@@ -216,6 +237,6 @@ class Graph:
                 else:
                     self.actors_given_year(year)
 
-
-graph = Graph()
-graph.start_query()
+#
+# graph = Graph()
+# graph.start_query()
