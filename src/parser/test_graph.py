@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src.parser.graph import Graph, Movie, Actor
+from src.parser.graph import Graph
 
 
 class TestGraph(TestCase):

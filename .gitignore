@@ -1,8 +1,16 @@
 # Created by .ignore support plugin (hsz.mobi)
-src/parser/__init__.py
-src/__init__.py
+
 .idea
 README.md
 src/__pycache__
 src/parser/__pycache__
 src/parser/data_for_test.json
+src/parser/.coverage
+.coverage
+.pytest_cache
+src/parser/htmlcov
+src/parser/.pytest_cache
+
+
+
+

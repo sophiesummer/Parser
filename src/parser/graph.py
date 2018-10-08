@@ -48,7 +48,7 @@ class Graph:
 
     # get data from json file
     def get_graph_data(self):
-        f = open('data.json')
+        f = open('data_for_test.json')
         graph_data = json.loads(f.read())
         return graph_data
 
@@ -181,81 +181,3 @@ class Graph:
             print(actor_gross[i]['actor_name'] + " : " + str(actor_gross[i]['total_gross']))
             gross_namelist.append(actor_gross[i]['actor_name'])
         return gross_namelist
-
-    # graph query interface
-    def start_query(self):
-        self.construct_graph()
-        num = 0
-        while num != -1:
-            print("Please input a query number: ")
-            try:
-                num = int(input())
-            except:
-                num = 0
-
-            if num == 1:
-                print('Please input a movie name: ')
-                movie_name = input()
-                result = self.get_gross(movie_name)
-                if result is not None:
-                    print(result)
-
-            elif num == 2:
-                print('Please input an actor name: ')
-                actor_name = input()
-                self.get_all_movie_of_actor(actor_name)
-
-            elif num == 3:
-                print('Please input a movie name: ')
-                movie_name = input()
-                self.get_all_actor_of_movie(movie_name)
-
-            elif num == 4:
-                print('Please input the number of actors: ')
-                number = input()
-                try:
-                    number = int(number)
-                except:
-                    print('the number is invalid')
-                else:
-                    if number < 0 :
-                        print('Please input a positive number: ')
-                    else:
-                        self.top_X_actors_with_most_gross(number)
-
-            elif num == 5:
-                print('Please input the number of actors: ')
-                number = input()
-                try:
-                    number = int(number)
-                except:
-                    print('the number is illegal')
-                else:
-                    if number < 0 :
-                        print('Please input a positive number: ')
-                    else:
-                        self.oldest_X_actors(number)
-
-            elif num == 6:
-                print('Please input a year: ')
-                year = input()
-                try:
-                    year = int(year)
-                except:
-                    print('the year is illegal')
-                else:
-                    self.all_movie_given_year(year)
-
-            elif num == 7:
-                print('Please input a year: ')
-                year = input()
-                try:
-                    year = int(year)
-                except:
-                    print('the year is illegal')
-                else:
-                    self.actors_given_year(year)
-
-#
-# graph = Graph()
-# graph.start_query()
