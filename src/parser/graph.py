@@ -3,10 +3,11 @@ import json
 
 # Actor class prepared for creating an Actor object
 class Actor:
-    def __init__(self, name, birthday, age, movies):
+    def __init__(self, name, birthday, age, movies, gross):
         self.name = name
         self.birthday = birthday
         self.age = age
+        self.gross = gross
         self.movie_name = movies
         self.movies_edge = {}  # dict(movie_name: weight)
 
@@ -50,6 +51,7 @@ class Graph:
     def get_graph_data(self):
         f = open('data_for_test.json')
         graph_data = json.loads(f.read())
+        f.close()
         return graph_data
 
     # construct whole graph structure
@@ -136,7 +138,7 @@ class Graph:
         number = max(number, 0)
         number = min(number, len(self.actors))
         oldest_actors = []
-        self.actors.sort(key = lambda  x: x.age, reverse=True)
+        self.actors.sort(key = lambda x: x.age, reverse=True)
         for i in range(number):
             print(self.actors[i].name + ' : ' + str(self.actors[i].age))
             oldest_actors.append(self.actors[i].name)
@@ -181,3 +183,4 @@ class Graph:
             print(actor_gross[i]['actor_name'] + " : " + str(actor_gross[i]['total_gross']))
             gross_namelist.append(actor_gross[i]['actor_name'])
         return gross_namelist
+

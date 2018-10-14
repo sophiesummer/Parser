@@ -31,7 +31,7 @@ class Scraper:
         self.start_url = start_url
         self.actors_data = []  # save result
         self.movies_data = []
-        logging.basicConfig(filename='scraper_status.log', level=logging.DEBUG)
+        logging.basicConfig(filename='scraper_status_test.log', level=logging.DEBUG)
 
     # given an actor webpage url and the name, scrap his age and movie works
     def scrap_actor(self, actor_url, actor_name):
