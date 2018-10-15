@@ -26,14 +26,11 @@ def get_actor_info(actor_name):
             abort(400)
 
     if request.method == 'DELETE':
-        count = 0
-        for actor_obj in graph.actors:
-            if actor_obj.name == actor_name:
-                graph.actors.remove(actor_obj)
-                count += 1
-                return jsonify({'message': 'delete successfully'})
+        count = delete_actor(actor_name)
         if count == 0:
             abort(400)
+        else:
+            return jsonify({'message': 'delete successfully'})
 
     if request.method == 'PUT':
         if actor_name not in graph.helper_actor_set:
@@ -59,22 +56,19 @@ def get_movie_info(movie_name):
             abort(400)
 
     if request.method == 'DELETE':
-        count = 0
-        if movie_name in graph.helper_set:
-            graph.helper_set.pop(movie_name, None)
-        for movie_obj in graph.movies:
-            if movie_obj.name == movie_name:
-                graph.movies.remove(movie_obj)
-                count += 1
-                return jsonify({'message': 'delete successfully'})
+        count = delete_movie(movie_name)
         if count == 0:
             abort(400)
+        else:
+            return jsonify({'message': 'delete successfully'})
 
     if request.method == 'PUT':
         if movie_name not in graph.helper_set:
             abort(400)
         update_movie_info(movie_name, json.loads(request.data.decode('ascii')))
         return jsonify({'message': 'update successfully'})
+
+
 
 
 # get actors with arguments to filter out unqualified items
@@ -239,6 +233,27 @@ def filter_actor(attr_args):
     return qualified_actor
 
 
+# delete movie object from graph
+# :param movie_name: the name of movie which will be deleted
+def delete_movie(movie_name):
+    count = 0
+    if movie_name in graph.helper_set:
+        graph.helper_set.pop(movie_name, None)
+    for movie_obj in graph.movies:
+        if movie_obj.name == movie_name:
+            graph.movies.remove(movie_obj)
+            count += 1
+    return count
+
+
+def delete_actor(actor_name):
+    count = 0
+    for actor_obj in graph.actors:
+        if actor_obj.name == actor_name:
+            graph.actors.remove(actor_obj)
+            count += 1
+    return count
+
 # filter out unqualified movie objects according to arguments
 # :param attr_args: arguments for filtering
 def filter_movie(attr_args):
@@ -247,7 +262,6 @@ def filter_movie(attr_args):
     year = []
     gross = []
     actor = []
-
     if 'name' in attr_args:
         args_name = attr_args['name']
     else:

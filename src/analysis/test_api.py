@@ -244,8 +244,10 @@ class Test_API_Result(TestCase):
         self.assertEqual([], actor_qualified)
         actor_qualified = filter_actor({"name": '"Stacy Ferguson"|name="Colin Farrell"'})
         self.assertEqual('Colin Farrell', actor_qualified[0]['name'])
-        actor_qualified = filter_actor({"name": "Stacy Ferguson", 'age': '41|age=39',
-                                        'total_gross': '10', 'movies': 'Nine'})
+        actor_qualified = filter_actor({"name": "Stacy Ferguson",
+                                        'age': '41|age=39',
+                                        'total_gross': '10',
+                                        'movies': '"Nine|movies="The Aviator"'})
         self.assertEqual([], actor_qualified)
 
     def test_filter_movie(self):
@@ -253,14 +255,19 @@ class Test_API_Result(TestCase):
         self.assertEqual('The Towering Inferno', movie_qualified[0]['name'])
         movie_qualified = filter_movie({"name": "The Towering Inferno", "year": "2019"})
         self.assertEqual([], movie_qualified)
+        movie_qualified = filter_movie({"name": '"September"|name="Alice in Wonderland"', "year": "2019|year=1985",
+                                        "box_office": "20|box_office=23", "actors": '"Mia Farrow"|actors="Jack Warden"'})
+        self.assertEqual([], movie_qualified)
 
     def test_update_actor_info(self):
-        update_actor_info("Hayden Christensen", {"total_gross": 10})
+        update_actor_info("Hayden Christensen", {"total_gross": 10, "age": 36,
+                                                 "movies": ["First Kill 2"]})
         self.assertEqual(10, graph.helper_actor_set['Hayden Christensen'].gross)
 
     def test_update_movie_info(self):
-        update_movie_info("Toys", {"total_gross": 23.3})
-        self.assertEqual(23000000, graph.helper_set['Toys'].gross)
+        update_movie_info("Toys", {"box_office": 23.3, "year": 1993, "actors": ["Robin Williams",
+        "Michael Gambon", "Joan Cusack"], 'wiki_page': 'https://en.wikipedia.org/wiki/Toys_(film)'})
+        self.assertEqual(23.3, graph.helper_set['Toys'].gross)
 
     def test_create_new_actor(self):
         create_new_actor({"name": "Natalie Portman",
@@ -276,7 +283,14 @@ class Test_API_Result(TestCase):
         create_new_movie({"name": "Your Highness",
                           "box_office": 28,
                           "year": 2011,
+                          "wiki_page": 'https://en.wikipedia.org/wiki/Your_Highness',
                           "actors": ["Danny McBride", "James Franco", "Natalie Portman"]})
         self.assertEqual(28, graph.helper_set['Your Highness'].gross)
         self.assertEqual(["Danny McBride", "James Franco", "Natalie Portman"],
                          graph.helper_set['Your Highness'].actor_name)
+
+    def test_delete_movie(self):
+        self.assertEqual(1, delete_movie("The Aviator"))
+        self.assertEqual(0, delete_movie("The apple day"))
+        self.assertEqual(1, delete_actor("Spencer Breslin"))
+        self.assertEqual(0, delete_movie("Mickey"))
