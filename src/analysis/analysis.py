@@ -5,6 +5,8 @@ class DataAnalysis:
     graph = Graph()
     graph.construct_graph()
 
+    # find hub actors which have most connections to other actors
+    # :param k: return top k hub actors
     def hub_actor_connections(self, k):
         conn_info = []
         for actor_name in self.graph.helper_actor_set:
@@ -33,6 +35,7 @@ class DataAnalysis:
             result[ele['name']] = ele['count']
         return result
 
+    # find the age and total_gross value relationship
     def age_gross_relation(self):
         age_group = []
         age_gross = {}
@@ -47,6 +50,7 @@ class DataAnalysis:
                 age_gross[actor_age] = actor_obj.gross
         return age_gross
 
+    # find the total box_office for each year
     def year_gross_relation(self):
         year_group = []
         year_gross = {}

@@ -31,14 +31,18 @@ class Graph:
         self.helper_actor_set = {}
 
     # add an actor object to graph actor array
+    # :param actor: actor object which to be added in graph
     def add_actor(self, actor):
         self.actors.append(actor)
 
     # add a movie object to graph movie array
+    # :param movie: movie object which to be added in graph
     def add_movie(self, movie):
         self.movies.append(movie)
 
     # add edges between to linked actor and movie with weight
+    # :param actor: actor object to be connected with a movie
+    # :param movie: movie object to be connected with a actor
     def add_edges(self, actor, movie):
         weight = (200-actor.age)*10**4 + movie.gross * 0.00001
         if movie.name not in actor.movies_edge:
@@ -64,6 +68,7 @@ class Graph:
         self.construct_edges()
 
     # put actor information into individual Actor object and insert into graph
+    # :param actor_data: actor data part in json file
     def construct_actors(self, actor_data):
         for actor in actor_data:
             actor_obj = Actor(actor['name'], actor['birthday'], actor['age'], actor['movies'])
@@ -71,6 +76,7 @@ class Graph:
             self.helper_actor_set[actor['name']] = actor_obj
 
     # put movie information into individual Movie object and insert into graph
+    # :param movie_data: actor movie part in json file
     def construct_movies(self, movie_data):
         for movie in movie_data:
             movie_obj = Movie(movie['name'], movie['gross'], movie['year'], movie['actors'])
