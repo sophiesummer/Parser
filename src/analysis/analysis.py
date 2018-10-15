@@ -66,8 +66,3 @@ class DataAnalysis:
                 year_group.append(movie_year)
                 year_gross[movie_year] = movie_obj.gross
         return year_gross
-
-
-
-d = DataAnalysis()
-print(d.hub_actor_connections(-10))
