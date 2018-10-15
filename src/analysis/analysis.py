@@ -8,6 +8,8 @@ class DataAnalysis:
     # find hub actors which have most connections to other actors
     # :param k: return top k hub actors
     def hub_actor_connections(self, k):
+        if k <= 0:
+            return {}
         conn_info = []
         for actor_name in self.graph.helper_actor_set:
             ele = {}
@@ -67,3 +69,5 @@ class DataAnalysis:
 
 
 
+d = DataAnalysis()
+print(d.hub_actor_connections(-10))

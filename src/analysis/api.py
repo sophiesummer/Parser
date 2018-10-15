@@ -60,6 +60,8 @@ def get_movie_info(movie_name):
 
     if request.method == 'DELETE':
         count = 0
+        if movie_name in graph.helper_set:
+            graph.helper_set.pop(movie_name, None)
         for movie_obj in graph.movies:
             if movie_obj.name == movie_name:
                 graph.movies.remove(movie_obj)
@@ -81,7 +83,12 @@ def get_movie_info(movie_name):
 def filter_actor_info():
     result = {}
     if request.method == 'GET':
-        result["result"] = filter_actor(request.args)
+        request_args = {}
+        request_args['name'] = request.args.get('name')
+        request_args['age'] = request.args.get('age')
+        request_args['total_gross'] = request.args.get('total_gross')
+        request_args['movies'] = request.args.get('movies')
+        result["result"] = filter_actor(request_args)
         if len(result["result"]) == 0:
             abort(400)
         else:
@@ -102,7 +109,12 @@ def filter_actor_info():
 def filter_movie_info():
     result = {}
     if request.method == 'GET':
-        result['result'] = filter_movie(request.args)
+        request_args = {}
+        request_args['name'] = request.args.get('name')
+        request_args['year'] = request.args.get('year')
+        request_args['box_office'] = request.args.get('box_office')
+        request_args['actors'] = request.args.get('actors')
+        result['result'] = filter_movie(request_args)
         if len(result["result"]) == 0:
             abort(400)
         else:
@@ -149,10 +161,22 @@ def filter_actor(attr_args):
     age = []
     gross = []
     movie = []
-    args_name = attr_args.get('name')
-    args_age = attr_args.get('age')
-    args_gross = attr_args.get('total_gross')
-    args_movie = attr_args.get('movies')
+    if 'name' in attr_args:
+        args_name = attr_args['name']
+    else:
+        args_name = None
+    if 'age' in attr_args:
+        args_age = attr_args['age']
+    else:
+        args_age = None
+    if 'total_gross' in attr_args:
+        args_gross = attr_args['total_gross']
+    else:
+        args_gross = None
+    if 'movies' in attr_args:
+        args_movie = attr_args['movies']
+    else:
+        args_movie = None
 
     if args_name is not None:
         if '|' in args_name:
@@ -223,10 +247,23 @@ def filter_movie(attr_args):
     year = []
     gross = []
     actor = []
-    args_name = attr_args.get('name')
-    args_year = attr_args.get('year')
-    args_gross = attr_args.get('box_office')
-    args_actor = attr_args.get('actors')
+
+    if 'name' in attr_args:
+        args_name = attr_args['name']
+    else:
+        args_name = None
+    if 'year' in attr_args:
+        args_year = attr_args['year']
+    else:
+        args_year = None
+    if 'box_office' in attr_args:
+        args_gross = attr_args['box_office']
+    else:
+        args_gross = None
+    if 'actors' in attr_args:
+        args_actor = attr_args['actors']
+    else:
+        args_actor = None
 
     if args_name is not None:
         if '|' in args_name:
